@@ -1,0 +1,247 @@
+
+//Built on open source code. All correct actions are thiers, all mistakes are mine.
+
+#define s1_moisture 1
+#define s1_top 2
+#define s1_btm 3
+#define s2_moisture 2
+#define s2_top 4
+#define s2_btm 5
+#define s3_moisture 3
+#define s3_top 6
+#define s3_btm 7
+
+#include <dht11.h>
+//#include <LiquidCrystal.h>
+
+//activate LCD screen via these pins on non-stardard 16x4 clone settings
+
+//LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+
+dht11 DHT11;
+// analogical value obtained from the experiment
+
+int moisture1;
+int moisture2;
+int moisture3;
+int SoilMoisture1(){
+  int reading;
+
+  // set driver pins to outputs
+
+  pinMode(s1_top,OUTPUT);
+  pinMode(s1_btm,OUTPUT);
+
+  // drive a current through the divider in one direction
+
+  digitalWrite(s1_top,LOW);
+  digitalWrite(s1_btm,HIGH);
+
+  // wait a moment for capacitance effects to settle
+
+  delay(1000);
+
+  // take a reading
+
+  reading=analogRead(s1_moisture);
+
+  // reverse the current
+
+  digitalWrite(s1_top,HIGH);
+  digitalWrite(s1_btm,LOW);
+
+  // give as much time in 'reverse' as in 'forward'
+
+  delay(1000);
+
+  // stop the current
+
+  digitalWrite(s1_btm,LOW);
+
+  return reading;
+}
+
+int SoilMoisture2(){
+  int reading;
+
+  // set driver pins to outputs
+
+  pinMode(s2_top,OUTPUT);
+  pinMode(s2_btm,OUTPUT);
+
+  // drive a current through the divider in one direction
+
+  digitalWrite(s2_top,LOW);
+  digitalWrite(s2_btm,HIGH);
+
+  // wait a moment for capacitance effects to settle
+
+  delay(1000);
+
+  // take a reading
+
+  reading=analogRead(s2_moisture);
+
+  // reverse the current
+
+  digitalWrite(s2_top,HIGH);
+  digitalWrite(s2_btm,LOW);
+
+  // give as much time in 'reverse' as in 'forward'
+
+  delay(1000);
+
+  // stop the current
+
+  digitalWrite(s2_btm,LOW);
+
+  return reading;
+}
+
+int SoilMoisture3(){
+  int reading;
+
+  // set driver pins to outputs
+
+  pinMode(s3_top,OUTPUT);
+  pinMode(s3_btm,OUTPUT);
+
+  // drive a current through the divider in one direction
+
+  digitalWrite(s3_top,LOW);
+  digitalWrite(s3_btm,HIGH);
+
+  // wait a moment for capacitance effects to settle
+
+  delay(1000);
+
+  // take a reading
+
+  reading=analogRead(s3_moisture);
+
+  // reverse the current
+
+  digitalWrite(s3_top,HIGH);
+  digitalWrite(s3_btm,LOW);
+
+  // give as much time in 'reverse' as in 'forward'
+
+  delay(1000);
+
+  // stop the current
+
+  digitalWrite(s3_btm,LOW);
+
+  return reading;
+}
+
+void setup()
+{
+  DHT11.attach(13);
+  Serial.begin(115200);
+  Serial.println("Garden Monitor Version 0.0.7 ");
+  Serial.println("Booting up and running first tests ");
+  Serial.println("AgData.info: Sensor= ACSoil,3; Sensor=DHT-11,1; Sensor=Rain-1,1 ");
+  delay(5000);
+ 
+  // set up the LCD's number of columns and rows: 
+
+  //  lcd.begin(16, 2);
+}
+
+void loop()
+{
+  // assign the result of SoilMoisture() to the global variable 'moisture'
+
+  moisture1 = SoilMoisture1();
+  moisture2 = SoilMoisture2();
+  moisture3 = SoilMoisture3();
+
+
+  //LCD code for on site monitoring of ardu data
+
+  // lcd.clear();
+
+  // lcd.print("Soil; ");
+  // lcd.println(moisture);
+  //  lcd.println("\n");
+
+  //delay(500);
+
+  // lcd.clear();
+
+  // lcd.print("Humidity (%): ");
+  // lcd.println((float)DHT11.humidity, DEC);
+
+  //delay(500);
+
+  // lcd.clear();
+
+  // lcd.print("Temp (°F): ");
+  //  lcd.println(DHT11.fahrenheit(), DEC);
+
+  //delay(500);
+
+  int chk = DHT11.read();
+
+
+  switch (chk)
+  {
+  case 0: 
+
+    Serial.println("Diagnostic Check: OK ");
+    Serial.println(" ");
+    Serial.println(" "); 
+    break;
+  case -1: 
+    Serial.println("Diagnostic Check: Fail due to Checksum error"); 
+    break;
+  case -2: 
+    Serial.println("Diagnostic Check: Fail due to Time out error"); 
+    break;
+  default: 
+    Serial.println("Diagnostic Check:Fail due to Unknown error"); 
+    break;
+  }
+  
+  Serial.println(" ");
+  Serial.print("  Rain scores below 1000 = Moisture, ");
+  int sensorValue=analogRead(A5);
+  Serial.println(sensorValue);
+  
+  Serial.println(" ");
+   
+  Serial.print("  Garden Bed Soil Moisture Sensor 3, ");
+  Serial.println(moisture3);
+  
+  Serial.print("  Garden Bed Soil Moisture Sensor 2, ");
+  Serial.println(moisture2);
+  
+  Serial.print("  Garden Bed Soil Moisture Sensor 1, ");
+  Serial.println(moisture1);
+  Serial.println(" ");
+  Serial.print("  Humidity (%), ");
+  Serial.println((float)DHT11.humidity, DEC);
+  Serial.println(" ");
+  Serial.print("  Temperature (°C), ");
+  Serial.println((float)DHT11.temperature, DEC);
+
+  Serial.print("  Temperature (°F), ");
+  Serial.println(DHT11.fahrenheit(), DEC);
+
+  Serial.print("  Temperature (°K), ");
+  Serial.println(DHT11.kelvin(), DEC);
+  Serial.println(" ");
+  Serial.print("  Dew Point (°C), ");
+  Serial.println(DHT11.dewPoint(), DEC);
+
+  Serial.print("  Dew PointFast (°C), ");
+  Serial.println(DHT11.dewPointFast(), DEC);
+  Serial.println(" ");
+  Serial.println("Elle's Garden Monitor Results: ");
+  Serial.println("Elle's Garden Monitor Version 0.0.7 ");
+  delay(50000);
+}
+
+
+
